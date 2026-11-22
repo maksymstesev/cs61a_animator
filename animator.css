@@ -15,20 +15,51 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
   font-size: 14px;
 }
 
-/* Left column: the code editor. */
+/* Left column: the code editor. Width comes from --code-width (set in the view). */
 .code-col {
-  width: 42%;
-  min-width: 320px;
-  max-width: 720px;
+  width: var(--code-width, 42%);
+  min-width: 240px;
   flex-shrink: 0;
   display: flex;
-  border-right: 1px solid #3a3a5e;
   background: #0f0f1e;
 }
 
 /* The code column stays in the DOM when collapsed, so CodeMirror keeps its
    state; hiding it gives the right column the full width. */
 .app.code-hidden .code-col { display: none; }
+.app.code-hidden .pane-splitter { display: none; }
+
+/* Draggable vertical rule between the code pane and the canvas. */
+.pane-splitter {
+  flex-shrink: 0;
+  width: 5px;
+  margin: 0 -2px;
+  cursor: col-resize;
+  position: relative;
+  z-index: 20;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.pane-splitter::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2px;
+  width: 1px;
+  background: #3a3a5e;
+  transition: background 0.12s ease, width 0.12s ease, left 0.12s ease;
+}
+.pane-splitter:hover::before,
+body.pane-resizing .pane-splitter::before {
+  left: 1px;
+  width: 3px;
+  background: #89ddff;
+}
+body.pane-resizing {
+  cursor: col-resize;
+}
 
 /* A small emoji button (the code pane's collapse toggle, and the playback
    controls once they exist). */
@@ -146,16 +177,34 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
   background: #0a0a14;
 }
 
-/* Drawing picker, save/new, and playback sliders across the top. */
+/* Drawing picker / playback on row 1; shape & speed sliders on row 2. */
 .anim-toolbar {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #12122a;
+  border-bottom: 1px solid #3a3a5e;
+}
+.toolbar-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 14px;
-  padding: 10px 14px;
-  background: #12122a;
-  border-bottom: 1px solid #3a3a5e;
+  min-width: 0;
+}
+.toolbar-sliders {
+  width: 100%;
+}
+.toolbar-sliders .slider {
+  flex: 1 1 180px;
+  max-width: none;
+}
+.toolbar-controls .palette-slider {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: none;
 }
 
 .drawing-select {
